@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import Classes.Conexao;
 import Classes.Empresa;
 import Classes.Funcionario;
+import Classes.Associacao;
 
 
 
@@ -45,7 +46,7 @@ public class Principal extends JFrame {
 	 * Create the frame.
 	 */
 	static Conexao ConBD = new Conexao();
-	boolean resp = ConBD.ConectaBD("root", "", 
+	boolean resp = ConBD.ConectaBD("root", "root", 
 					"localhost", "3306", "Prog4_2024");
 	
 	public static void insertEmp(String nome, String CNPJ, String Ramo) {	
@@ -70,6 +71,18 @@ public class Principal extends JFrame {
 		ConBD.ExecutaSQL("Funcionario", ComandoParam, ListaParams);
 	}
 	
+	public static void insertAssoc(String idFunc, String idEmp, String data, String dataDemi) {
+		String ComandoParam = "INSERT INTO FuncionarioEmpresa " +
+                "(idFuncionarioEmpresa, idFuncionario, idEmpresa, DataAdmissao) VALUES " +
+                "(?, ?, ?, ?);";
+		
+		ArrayList<String> ListaParams = new ArrayList<String>();
+		ListaParams.add(idFunc);
+		ListaParams.add(idEmp);
+		ListaParams.add(data);
+		ConBD.ExecutaSQL("Associacao", ComandoParam, ListaParams);
+	}
+	
 	public void addMenu(JPanel ContentPane, JPanel item) {
 		item.setVisible(false);
 		item.setBounds(0, 50, 595, 441);
@@ -89,6 +102,14 @@ public class Principal extends JFrame {
 	public static ArrayList<Funcionario> getFuncionarios() {
 		return (ArrayList<Funcionario>) ConBD.ExecutaConsultaFunc();
 
+	}
+	
+	public static ArrayList<Associacao> getAssociacao() {
+		return (ArrayList<Associacao>) ConBD.ExecutaConsultaAssoc();
+	}
+	
+	public static String buscaNome(String tipo, int id) {
+		return ConBD.buscarNome(tipo, id);
 	}
 	
 	public Principal() {
@@ -113,11 +134,17 @@ public class Principal extends JFrame {
 		CadastroEmpresa menuEmp = new CadastroEmpresa();
 		addMenu(contentPane, menuEmp);
 		
+		MenuAssociacao assoc = new MenuAssociacao();
+		addMenu(contentPane, assoc);
+		
 		JButton btnVoltar = new JButton("Voltar");
 		btnVoltar.setVisible(false);
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				esconderMenu(Principal, menuFunc);
+				Principal.setVisible(true);
+				menuEmp.setVisible(false);
+				menuFunc.setVisible(false);
+				assoc.setVisible(false);
 				btnVoltar.setVisible(false);
 			}
 		});
@@ -151,6 +178,12 @@ public class Principal extends JFrame {
 		Principal.add(btnFunc);
 		
 		JButton btnAtribuir = new JButton("Atribuir funcionarios e empresas");
+		btnAtribuir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				esconderMenu(assoc, Principal);
+				btnVoltar.setVisible(true);
+			}
+		});
 		btnAtribuir.setFont(new Font("Tahoma", Font.BOLD, 15));
 		btnAtribuir.setBounds(92, 273, 419, 53);
 		Principal.add(btnAtribuir);

@@ -78,8 +78,17 @@ public class CadastroFuncionario extends JPanel {
 		JButton btnCadastrar = new JButton("Cadastrar");
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Principal.insertFunc(txtNome.getText(), txtCPF.getText());
-				atualizarModel(table);
+				if(txtCPF.getText().isEmpty() || txtNome.getText().isEmpty()) {
+					System.out.println("Preencha todos os campos!");
+				}
+				else {
+					Principal.insertFunc(txtNome.getText(), txtCPF.getText());
+					atualizarModel(table);
+		            MenuAssociacao.carregarCBFunc();		
+		            txtCPF.setText("");
+		            txtNome.setText("");
+					System.out.println("Funcionario registrado com sucesso!");
+				}
 			}
 		});
 		btnCadastrar.setFont(new Font("Tahoma", Font.BOLD, 15));

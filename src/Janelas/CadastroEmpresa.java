@@ -81,8 +81,19 @@ public class CadastroEmpresa extends JPanel {
 		JButton btnCadastrar = new JButton("Cadastrar");
 		btnCadastrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Principal.insertEmp(txtNome.getText(), txtCNPJ.getText(), txtRamo.getText());
-		        atualizarModel(table);
+				if(txtCNPJ.getText().isEmpty() || txtNome.getText().isEmpty() || txtRamo.getText().isEmpty()) {
+					System.out.println("Preencha todos os campos!");
+				}
+				else {
+					Principal.insertEmp(txtNome.getText(), txtCNPJ.getText(), txtRamo.getText());
+			        atualizarModel(table);
+			        MenuAssociacao.carregarCBEmp();
+			        System.out.println("Empresa registrada com sucesso!");
+			        txtNome.setText("");
+			        txtCNPJ.setText("");
+			        txtRamo.setText("");
+				}
+
 			}
 		});
 		btnCadastrar.setFont(new Font("Tahoma", Font.BOLD, 15));

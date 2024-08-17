@@ -58,8 +58,17 @@ public class Conexao {
 			    	nextId = rs.getString(1);
 				}
 			}
-			else {
+			else if (Fonte.equals("Funcionario")) {
 				String getNextIdQuery = "SELECT COUNT(idFuncionario) + 1 FROM Funcionario";
+				PreparedStatement stmt = Con.prepareStatement(getNextIdQuery);
+				ResultSet rs = stmt.executeQuery();
+
+				if (rs.next()) {
+			    	nextId = rs.getString(1);
+				}
+			}
+			else if (Fonte.equals("Associacao")) {
+				String getNextIdQuery = "SELECT COUNT(idFuncionarioEmpresa) + 1 FROM FuncionarioEmpresa";
 				PreparedStatement stmt = Con.prepareStatement(getNextIdQuery);
 				ResultSet rs = stmt.executeQuery();
 
@@ -83,21 +92,7 @@ public class Conexao {
 		}
 		return false;
 	}
-	
-	int buscarIdEmp() {
-		Statement st;
-		try {
-			st = this.Con.createStatement();
-			ResultSet resultado = st.executeQuery("Select Count(id) from empresa");
-			int val = ((Number) resultado.getObject(1)).intValue();
-			return val + 1;
 
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return 0;
-	}
 	
 	
 	public List<Empresa> ExecutaConsultaEmpresa(){
@@ -142,6 +137,55 @@ public class Conexao {
 		}
 		return new ArrayList<Funcionario>();	
 	}
+	
+	public ArrayList<Associacao> ExecutaConsultaAssoc() {
+		try {
+			Statement st = this.Con.createStatement();
+			ResultSet resultado = st.executeQuery("Select * from FuncionarioEmpresa");
+			ArrayList<Associacao> Lista = new ArrayList<Associacao>();
+			while(resultado.next()) {
+				Associacao FE1 = new Associacao();
+				FE1.setId(resultado.getInt("idFuncionarioEmpresa"));
+				FE1.setIdFunc(resultado.getInt("idFuncionario"));
+				FE1.setIdEmp(resultado.getInt("idEmpresa"));
+				FE1.setDtAdim(resultado.getString("DataAdmissao"));
+				FE1.setDtDemi(resultado.getString("DataDemissao"));
+				Lista.add(FE1);
+			}
+			return Lista;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new ArrayList<Associacao>();	
+	}
+	
+	public String buscarNome(String tipo, int id) {
+	    String comando;
+	    
+	    if(tipo.equals("Func")) {
+	        comando = "SELECT Nome FROM Funcionario Where idFuncionario = ?";
+	    } else {
+	        comando = "SELECT Nome FROM Empresa Where idEmpresa = ?";
+	    }
+	    
+	    try {
+	        PreparedStatement pst = Con.prepareStatement(comando);
+	        pst.clearParameters();
+	        pst.setInt(1, id);
+	        ResultSet nome = pst.executeQuery();
+	        
+	        if (nome.next()) {
+	            return nome.getString(1);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    
+	    return "";
+	}
+
 	
 	/*List<Aluno> ExecutaConsultaFunc(String ComandoSQL){
 		try {
